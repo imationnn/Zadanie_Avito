@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:15.8-alpine
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: always
+    networks:
+      - tenders
+
+  tender_api:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - ${HOST}:${PORT}:8080
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+    depends_on:
+      - postgres
+    networks:
+      - tenders
+
+networks:
+  tenders:
+    name: tenders
+    driver: bridge
